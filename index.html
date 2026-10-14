@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Food Rescue Network – Connecting Surplus Food with People in Need</title>
+  <meta name="description" content="Reduce food waste by connecting surplus food donors with NGOs, community kitchens, shelters, and volunteers." />
+
+  <!-- ============================================================
+       STYLES – All CSS is written here inside one <style> block.
+       No external CSS libraries are needed.
+  ============================================================ -->
+  <style>
+    /* ── CSS Custom Properties (variables) ── */
+    :root {
+      --green-dark:   #1b5e20;
+      --green-mid:    #2e7d32;
+      --green-light:  #4caf50;
+      --green-pale:   #c8e6c9;
+      --green-bg:     #f1f8e9;
+      --cream:        #fffde7;
+      --amber:        #ff8f00;
+      --amber-light:  #fff8e1;
+      --red:          #c62828;
+      --red-light:    #ffebee;
+      --text-dark:    #212121;
+      --text-mid:     #424242;
+      --text-light:   #757575;
+      --white:        #ffffff;
+      --shadow:       0 2px 12px rgba(0,0,0,0.10);
+      --shadow-md:    0 4px 20px rgba(0,0,0,0.14);
+      --radius:       12px;
+      --radius-sm:    8px;
+      --transition:   0.25s ease;
+    }
+
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--green-bg);
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+    a { color: var(--green-mid); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    img { max-width: 100%; display: block; }
+    button { cursor: pointer; border: none; font-family: inherit; }
+    input, select, textarea { font-family: inherit; }
+
+    /* ── Utility Classes ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.25rem; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+    .hidden { display: none !important; }
+    .text-center { text-align: center; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mt-2 { margin-top: 1rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .badge {
+      display: inline-block; padding: 0.2em 0.65em;
+      border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+    }
+    .badge-green  { background: var(--green-pale); color: var(--green-dark); }
+    .badge-amber  { background: var(--amber-light); color: var(--amber); }
+    .badge-red    { background: var(--red-light); color: var(--red); }
+    .badge-gray   { background: #e0e0e0; color: #616161; }
+
+    /* ── Navigation Bar ── */
+    #navbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--green-dark);
+      box-shadow: var(--shadow-md);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.8rem 1.25rem; max-width: 1200px; margin: 0 auto;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 0.6rem;
+      color: var(--white); font-size: 1.1rem; font-weight: 700;
+      text-decoration: none;
+    }
+    .nav-brand .logo { font-size: 1.6rem; }
+    .nav-links {
+      display: flex; gap: 0.25rem; list-style: none; flex-wrap: wrap;
+    }
+    .nav-links a {
+      color: var(--green-pale); padding: 0.4rem 0.75rem;
+      border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 500;
+      transition: background var(--transition), color var(--transition);
+      display: block;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      background: var(--green-mid); color: var(--white); text-decoration: none;
+    }
+    /* Hamburger for mobile */
+    .nav-toggle {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; padding: 6px; border-radius: var(--radius-sm);
+    }
+    .nav-toggle span {
+      width: 24px; height: 2px; background: var(--white);
+      border-radius: 2px; transition: var(--transition);
+    }
+    @media (max-width: 768px) {
+      .nav-toggle { display: flex; }
+      .nav-links {
+        display: none; position: absolute; top: 100%; left: 0; right: 0;
+        background: var(--green-dark); flex-direction: column; gap: 0;
+        padding: 0.5rem 1rem 1rem; box-shadow: var(--shadow-md);
+      }
+      .nav-links.open { display: flex; }
+      #navbar { position: relative; }
+    }
+
+    /* ── Hero Section ── */
+    #home {
+      background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 60%, var(--green-light) 100%);
+      color: var(--white); padding: 5rem 1.25rem 4rem; text-align: center;
+    }
+    .hero-icon { font-size: 4rem; margin-bottom: 1rem; animation: float 3s ease-in-out infinite; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-10px); }
+    }
+    .hero-title { font-size: clamp(1.8rem, 5vw, 3rem); font-weight: 800; margin-bottom: 0.75rem; }
+    .hero-sub   { font-size: clamp(1rem, 2.5vw, 1.25rem); opacity: 0.9; max-width: 640px; margin: 0 auto 2rem; }
+    .hero-cta   { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.75rem 1.5rem; border-radius: var(--radius);
+      font-size: 1rem; font-weight: 600; transition: transform 0.15s, box-shadow 0.15s;
+      border: 2px solid transparent;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); text-decoration: none; }
+    .btn:active { transform: translateY(0); }
+    .btn:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+    .btn-primary { background: var(--white); color: var(--green-dark); }
+    .btn-secondary { background: transparent; color: var(--white); border-color: var(--white); }
+    .btn-green  { background: var(--green-mid); color: var(--white); }
+    .btn-green:hover { background: var(--green-dark); }
+    .btn-amber  { background: var(--amber); color: var(--white); }
+    .btn-amber:hover { background: #e65100; }
+    .btn-sm { padding: 0.45rem 1rem; font-size: 0.875rem; border-radius: var(--radius-sm); }
+    .btn-danger { background: var(--red); color: var(--white); }
+    .btn-outline { background: transparent; border: 2px solid var(--green-mid); color: var(--green-mid); }
+    .btn-outline:hover { background: var(--green-mid); color: var(--white); }
+
+    /* ── Stats Strip (below hero) ── */
+    .stats-strip {
+      background: var(--white); box-shadow: var(--shadow);
+      padding: 1.5rem 1.25rem;
+    }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem; max-width: 1200px; margin: 0 auto; text-align: center;
+    }
+    .stat-card { padding: 1rem; border-radius: var(--radius); background: var(--green-bg); }
+    .stat-value { font-size: 2rem; font-weight: 800; color: var(--green-dark); }
+    .stat-label { font-size: 0.8rem; color: var(--text-light); margin-top: 0.25rem; }
+
+    /* ── Section Wrappers ── */
+    .section { padding: 3rem 1.25rem; }
+    .section-alt { background: var(--white); }
+    .section-title {
+      font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700;
+      color: var(--green-dark); margin-bottom: 0.5rem;
+    }
+    .section-desc { color: var(--text-mid); max-width: 600px; margin-bottom: 2rem; }
+
+    /* ── Demo Notice Banner ── */
+    .demo-notice {
+      background: var(--amber-light); border-left: 4px solid var(--amber);
+      border-radius: var(--radius-sm); padding: 0.75rem 1rem;
+      font-size: 0.85rem; color: #5d4037; margin-bottom: 1.5rem;
+      display: flex; align-items: flex-start; gap: 0.5rem;
+    }
+
+    /* ── Donation Form Card ── */
+    .form-card {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 2rem;
+      max-width: 720px; margin: 0 auto;
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    .form-group.full-width { grid-column: 1 / -1; }
+    label { font-size: 0.875rem; font-weight: 600; color: var(--text-mid); }
+    label .req { color: var(--red); margin-left: 2px; }
+    input[type="text"], input[type="email"], input[type="tel"],
+    input[type="number"], input[type="datetime-local"], input[type="date"],
+    select, textarea {
+      width: 100%; padding: 0.6rem 0.8rem;
+      border: 1.5px solid #bdbdbd; border-radius: var(--radius-sm);
+      font-size: 0.95rem; transition: border-color var(--transition);
+      background: var(--white); color: var(--text-dark);
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--green-light);
+      box-shadow: 0 0 0 3px rgba(76,175,80,0.15);
+    }
+    .field-error { font-size: 0.8rem; color: var(--red); margin-top: 0.2rem; }
+    .form-actions { display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
+    .form-hint { font-size: 0.8rem; color: var(--text-light); }
+
+    /* ── Alert / Toast ── */
+    #toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 999;
+      max-width: 340px;
+    }
+    .toast-msg {
+      padding: 0.85rem 1.2rem; border-radius: var(--radius);
+      font-size: 0.9rem; font-weight: 500; box-shadow: var(--shadow-md);
+      display: flex; align-items: center; gap: 0.6rem;
+      animation: slideIn 0.3s ease forwards;
+    }
+    .toast-success { background: var(--green-mid); color: var(--white); }
+    .toast-error   { background: var(--red); color: var(--white); }
+    .toast-info    { background: #1565c0; color: var(--white); }
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+
+    /* ── Food Listings / Cards ── */
+    .filter-bar {
+      display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end;
+      background: var(--white); padding: 1rem; border-radius: var(--radius);
+      box-shadow: var(--shadow); margin-bottom: 1.5rem;
+    }
+    .filter-bar .form-group { min-width: 180px; margin: 0; }
+    .filter-bar label { font-size: 0.8rem; }
+    .donations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+    .donation-card {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+      display: flex; flex-direction: column;
+    }
+    .donation-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .card-thumb {
+      height: 140px; display: flex; align-items: center; justify-content: center;
+      font-size: 4.5rem; background: var(--green-bg);
+    }
+    .card-body { padding: 1rem; flex: 1; display: flex; flex-direction: column; gap: 0.4rem; }
+    .card-title { font-size: 1.05rem; font-weight: 700; color: var(--green-dark); }
+    .card-meta  { font-size: 0.82rem; color: var(--text-light); display: flex; flex-wrap: wrap; gap: 0.35rem 0.75rem; }
+    .card-meta span { display: flex; align-items: center; gap: 0.25rem; }
+    .card-footer {
+      padding: 0.75rem 1rem; border-top: 1px solid #f0f0f0;
+      display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .card-status { font-size: 0.78rem; font-weight: 600; }
+    .urgency-tag {
+      font-size: 0.72rem; background: var(--amber-light); color: var(--amber);
+      padding: 0.15em 0.5em; border-radius: 999px; font-weight: 600;
+    }
+    .empty-state {
+      text-align: center; padding: 3rem 1rem; color: var(--text-light);
+      grid-column: 1 / -1;
+    }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 0.75rem; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+      z-index: 200; display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: var(--shadow-md); width: 100%; max-width: 520px;
+      max-height: 90vh; overflow-y: auto; padding: 2rem;
+      animation: popIn 0.2s ease;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .modal-title  { font-size: 1.2rem; font-weight: 700; color: var(--green-dark); }
+    .modal-close  { background: none; font-size: 1.4rem; color: var(--text-light); padding: 0.2rem 0.5rem; border-radius: var(--radius-sm); }
+    .modal-close:hover { background: var(--red-light); color: var(--red); }
+    .donation-detail { background: var(--green-bg); padding: 0.75rem; border-radius: var(--radius-sm); margin-bottom: 1rem; }
+    .donation-detail p { font-size: 0.88rem; margin-bottom: 0.3rem; }
+    .donation-detail strong { color: var(--green-dark); }
+
+    /* ── Match Section ── */
+    .match-panel {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 1.5rem; margin-top: 1.5rem;
+    }
+    .match-card {
+      border: 2px solid var(--green-pale); border-radius: var(--radius);
+      padding: 1rem; margin-bottom: 1rem; background: var(--green-bg);
+    }
+    .match-reasons { list-style: none; margin-top: 0.5rem; }
+    .match-reasons li { font-size: 0.82rem; color: var(--green-dark); }
+    .match-reasons li::before { content: "✅ "; }
+
+    /* ── How It Works ── */
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+    .step-card {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 1.5rem; text-align: center;
+    }
+    .step-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .step-title { font-weight: 700; margin-bottom: 0.5rem; color: var(--green-dark); }
+    .step-desc  { font-size: 0.88rem; color: var(--text-mid); }
+
+    /* ── Food Safety Section ── */
+    .safety-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+    .safety-card {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 1.25rem;
+    }
+    .safety-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .safety-title { font-weight: 700; margin-bottom: 0.4rem; color: var(--green-dark); }
+    .safety-desc  { font-size: 0.85rem; color: var(--text-mid); }
+    .warning-box {
+      background: var(--amber-light); border: 1.5px solid var(--amber);
+      border-radius: var(--radius); padding: 1rem; margin-top: 1.5rem;
+    }
+    .warning-box p { font-size: 0.88rem; color: #5d4037; }
+    .warning-box strong { color: var(--amber); }
+
+    /* ── About / Footer ── */
+    #about { background: var(--green-dark); color: var(--white); }
+    #about .section-title { color: var(--white); }
+    #about .section-desc  { color: var(--green-pale); max-width: 700px; }
+    .about-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem; margin-top: 1.5rem;
+    }
+    .about-card {
+      background: rgba(255,255,255,0.08); border-radius: var(--radius);
+      padding: 1.25rem; text-align: center;
+    }
+    .about-card .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .about-card p { font-size: 0.85rem; color: var(--green-pale); }
+    footer {
+      background: #0a2e0d; color: var(--green-pale);
+      text-align: center; padding: 1.25rem;
+      font-size: 0.82rem;
+    }
+    footer a { color: var(--green-pale); }
+
+    /* ── Dashboard Section ── */
+    .dashboard-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem; margin-bottom: 2rem;
+    }
+    .dash-card {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 1.5rem; text-align: center;
+    }
+    .dash-value { font-size: 2.5rem; font-weight: 800; color: var(--green-dark); }
+    .dash-label { font-size: 0.82rem; color: var(--text-light); margin-top: 0.3rem; }
+    .dash-icon  { font-size: 2rem; margin-bottom: 0.5rem; }
+    .assumption-note { font-size: 0.8rem; color: var(--text-light); font-style: italic; margin-top: 0.5rem; }
+
+    /* ── Accessibility ── */
+    :focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    /* ── Misc / Confirm Dialog ── */
+    .confirm-box {
+      background: var(--red-light); border: 1.5px solid var(--red);
+      border-radius: var(--radius); padding: 1.25rem; margin-top: 1rem;
+    }
+    .confirm-box p { color: var(--red); margin-bottom: 0.75rem; font-weight: 600; }
+    .confirm-actions { display: flex; gap: 0.75rem; }
+  </style>
+</head>
+
+<body>
+  <!-- ============================================================
+       NAVIGATION BAR
+  ============================================================ -->
+  <nav id="navbar" role="navigation" aria-label="Main Navigation">
+    <div class="nav-inner">
+      <a href="#home" class="nav-brand" aria-label="Smart Food Rescue Network Home">
+        <span class="logo" aria-hidden="true">🌿</span>
+        <span>Smart Food Rescue</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks" role="list">
+        <li><a href="#home">🏠 Home</a></li>
+        <li><a href="#donate">🍱 Donate Food</a></li>
+        <li><a href="#find">🔍 Find Food</a></li>
+        <li><a href="#how-it-works">📋 How It Works</a></li>
+        <li><a href="#safety">🛡️ Food Safety</a></li>
+        <li><a href="#about">ℹ️ About</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ============================================================
+       HERO SECTION
+  ============================================================ -->
+  <section id="home" aria-labelledby="hero-title">
+    <div class="hero-icon" aria-hidden="true">🥗</div>
+    <h1 class="hero-title" id="hero-title">Smart Food Rescue Network</h1>
+    <p class="hero-sub">
+      Connecting surplus food with people in need — reducing waste, feeding communities,
+      and protecting our planet, one meal at a time.
+    </p>
+    <div class="hero-cta">
+      <a href="#donate" class="btn btn-primary">🍱 Donate Surplus Food</a>
+      <a href="#find"   class="btn btn-secondary">🔍 Find Available Food</a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DASHBOARD / STATS STRIP
+  ============================================================ -->
+  <div class="stats-strip" role="region" aria-label="Platform statistics">
+    <div class="stats-grid" id="statsStrip">
+      <!-- Rendered by JS -->
+    </div>
+    <p class="assumption-note text-center mt-1">
+      ⚠️ These figures include demonstration sample data and are for illustration only.
+      Estimated meals assume an average of 0.5 kg per meal.
+    </p>
+  </div>
+
+  <!-- ============================================================
+       HOW IT WORKS
+  ============================================================ -->
+  <section id="how-it-works" class="section section-alt" aria-labelledby="hiw-title">
+    <div class="container">
+      <h2 class="section-title" id="hiw-title">📋 How It Works</h2>
+      <p class="section-desc">Three simple steps to rescue surplus food and support your community.</p>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-icon" aria-hidden="true">🍽️</div>
+          <h3 class="step-title">1. Donate Surplus Food</h3>
+          <p class="step-desc">
+            Restaurants, households, events, and grocery stores submit safe, surplus food
+            through the donation form with pickup details and safety information.
+          </p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon" aria-hidden="true">🔍</div>
+          <h3 class="step-title">2. NGOs &amp; Volunteers Find Food</h3>
+          <p class="step-desc">
+            Community kitchens, shelters, and volunteers browse available donations,
+            filter by category and location, and request a pickup.
+          </p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon" aria-hidden="true">🤝</div>
+          <h3 class="step-title">3. Complete the Pickup</h3>
+          <p class="step-desc">
+            Once food is collected and distributed, the donation is marked as completed,
+            updating the community impact dashboard.
+          </p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon" aria-hidden="true">🌍</div>
+          <h3 class="step-title">4. Reduce Food Waste</h3>
+          <p class="step-desc">
+            Every rescued meal means less organic waste in landfills,
+            lower greenhouse gas emissions, and more food reaching those who need it.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DONATE FOOD SECTION
+  ============================================================ -->
+  <section id="donate" class="section" aria-labelledby="donate-title">
+    <div class="container">
+      <h2 class="section-title" id="donate-title">🍱 Donate Surplus Food</h2>
+      <p class="section-desc">
+        Fill in the form below to list your surplus food. All fields marked <span style="color:var(--red)">*</span> are required.
+      </p>
+
+      <div class="demo-notice" role="note">
+        <span aria-hidden="true">⚠️</span>
+        <span>
+          <strong>Demonstration prototype.</strong>
+          Data is saved locally in your browser. Submissions are <em>not</em> independently verified.
+          Please follow applicable local food safety and donation guidelines in real-world operations.
+        </span>
+      </div>
+
+      <div class="form-card">
+        <form id="donationForm" novalidate aria-label="Food donation form">
+          <div class="form-grid">
+
+            <!-- Donor Name -->
+            <div class="form-group">
+              <label for="donorName">Donor / Organisation Name <span class="req" aria-hidden="true">*</span></label>
+              <input type="text" id="donorName" name="donorName" placeholder="e.g. Green Campus Café"
+                     autocomplete="organization" required aria-required="true" />
+              <span class="field-error hidden" id="err-donorName" role="alert"></span>
+            </div>
+
+            <!-- Contact -->
+            <div class="form-group">
+              <label for="donorContact">Contact (Phone / Email) <span class="req" aria-hidden="true">*</span></label>
+              <input type="text" id="donorContact" name="donorContact" placeholder="e.g. 9876543210"
+                     autocomplete="tel" required aria-required="true" />
+              <span class="field-error hidden" id="err-donorContact" role="alert"></span>
+            </div>
+
+            <!-- Food Name -->
+            <div class="form-group">
+              <label for="foodName">Food Name <span class="req" aria-hidden="true">*</span></label>
+              <input type="text" id="foodName" name="foodName" placeholder="e.g. Vegetable Biryani"
+                     required aria-required="true" />
+              <span class="field-error hidden" id="err-foodName" role="alert"></span>
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+              <label for="foodCategory">Food Category <span class="req" aria-hidden="true">*</span></label>
+              <select id="foodCategory" name="foodCategory" required aria-required="true">
+                <option value="">— Select Category —</option>
+                <option value="Cooked Meals">🍛 Cooked Meals</option>
+                <option value="Fruits">🍎 Fruits</option>
+                <option value="Vegetables">🥦 Vegetables</option>
+                <option value="Packaged Food">📦 Packaged Food</option>
+                <option value="Bakery Items">🥐 Bakery Items</option>
+                <option value="Other">🥡 Other</option>
+              </select>
+              <span class="field-error hidden" id="err-foodCategory" role="alert"></span>
+            </div>
+
+            <!-- Quantity -->
+            <div class="form-group">
+              <label for="quantity">Quantity <span class="req" aria-hidden="true">*</span></label>
+              <input type="text" id="quantity" name="quantity" placeholder="e.g. 5 kg or 20 packets"
+                     required aria-required="true" />
+              <span class="field-error hidden" id="err-quantity" role="alert"></span>
+            </div>
+
+            <!-- Veg / Non-Veg -->
+            <div class="form-group">
+              <label for="vegType">Vegetarian / Non-Vegetarian</label>
+              <select id="vegType" name="vegType">
+                <option value="Vegetarian">🟢 Vegetarian</option>
+                <option value="Non-Vegetarian">🔴 Non-Vegetarian</option>
+                <option value="Vegan">🌱 Vegan</option>
+                <option value="Not Sure">❓ Not Sure</option>
+              </select>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group full-width">
+              <label for="foodDesc">Food Description / Ingredients</label>
+              <textarea id="foodDesc" name="foodDesc" rows="2"
+                        placeholder="Briefly describe the food, ingredients, or known allergens…"></textarea>
+            </div>
+
+            <!-- Prep / Packaging Date -->
+            <div class="form-group">
+              <label for="prepDate">Preparation / Packaging Date &amp; Time</label>
+              <input type="datetime-local" id="prepDate" name="prepDate" />
+            </div>
+
+            <!-- Expiry / Consume By -->
+            <div class="form-group">
+              <label for="expiryDate">Safe Consumption Deadline / Best Before</label>
+              <input type="datetime-local" id="expiryDate" name="expiryDate" />
+              <span class="form-hint">Leaving this blank will display a safety warning on the listing.</span>
+            </div>
+
+            <!-- Pickup Location -->
+            <div class="form-group full-width">
+              <label for="pickupLocation">Pickup Location <span class="req" aria-hidden="true">*</span></label>
+              <input type="text" id="pickupLocation" name="pickupLocation"
+                     placeholder="e.g. Block B Canteen, City College, Main Street"
+                     required aria-required="true" />
+              <span class="field-error hidden" id="err-pickupLocation" role="alert"></span>
+            </div>
+
+            <!-- Pickup Availability -->
+            <div class="form-group">
+              <label for="pickupFrom">Pickup Available From <span class="req" aria-hidden="true">*</span></label>
+              <input type="datetime-local" id="pickupFrom" name="pickupFrom" required aria-required="true" />
+              <span class="field-error hidden" id="err-pickupFrom" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="pickupUntil">Pickup Available Until <span class="req" aria-hidden="true">*</span></label>
+              <input type="datetime-local" id="pickupUntil" name="pickupUntil" required aria-required="true" />
+              <span class="field-error hidden" id="err-pickupUntil" role="alert"></span>
+            </div>
+
+            <!-- Safety Notes -->
+            <div class="form-group full-width">
+              <label for="safetyNotes">Additional Food Safety Notes</label>
+              <textarea id="safetyNotes" name="safetyNotes" rows="2"
+                        placeholder="Storage conditions, allergen warnings, handling instructions…"></textarea>
+            </div>
+
+          </div><!-- /form-grid -->
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-green">✅ Submit Donation</button>
+            <button type="reset"  class="btn btn-outline" id="resetFormBtn">🔄 Reset Form</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FIND FOOD / LISTINGS SECTION
+  ============================================================ -->
+  <section id="find" class="section section-alt" aria-labelledby="find-title">
+    <div class="container">
+      <h2 class="section-title" id="find-title">🔍 Find Available Food</h2>
+      <p class="section-desc">Browse current surplus food listings. Use filters to narrow your search.</p>
+
+      <div class="demo-notice" role="note">
+        <span aria-hidden="true">📌</span>
+        <span>
+          <strong>Sample demonstration data is shown below.</strong>
+          These are example records to illustrate the application.
+          In a real deployment, live donor submissions would appear here.
+        </span>
+      </div>
+
+      <!-- ── Filter Bar ── -->
+      <div class="filter-bar" role="search" aria-label="Filter food donations">
+        <div class="form-group">
+          <label for="searchQuery">🔎 Search</label>
+          <input type="text" id="searchQuery" placeholder="Food name or location…" aria-label="Search by food name or location" />
+        </div>
+        <div class="form-group">
+          <label for="filterCategory">Category</label>
+          <select id="filterCategory" aria-label="Filter by category">
+            <option value="">All Categories</option>
+            <option value="Cooked Meals">🍛 Cooked Meals</option>
+            <option value="Fruits">🍎 Fruits</option>
+            <option value="Vegetables">🥦 Vegetables</option>
+            <option value="Packaged Food">📦 Packaged Food</option>
+            <option value="Bakery Items">🥐 Bakery Items</option>
+            <option value="Other">🥡 Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="filterStatus">Status</label>
+          <select id="filterStatus" aria-label="Filter by status">
+            <option value="">All Statuses</option>
+            <option value="Available">Available</option>
+            <option value="Pickup Requested">Pickup Requested</option>
+            <option value="Collected">Collected</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="filterLocation">Location</label>
+          <input type="text" id="filterLocation" placeholder="Area or landmark…" aria-label="Filter by location" />
+        </div>
+        <button class="btn btn-green btn-sm" id="applyFiltersBtn">Apply Filters</button>
+        <button class="btn btn-outline btn-sm" id="clearFiltersBtn">Clear</button>
+      </div>
+
+      <!-- ── Smart Match Panel ── -->
+      <div class="match-panel" id="matchPanel" aria-live="polite" aria-label="Smart food matching">
+        <h3 style="color:var(--green-dark); margin-bottom:0.75rem;">🤖 Smart Food Matching</h3>
+        <p style="font-size:0.88rem;color:var(--text-mid);margin-bottom:1rem;">
+          Enter your preferences below to get recommended donations ranked by suitability.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-bottom:1rem;">
+          <div class="form-group" style="min-width:160px;">
+            <label for="matchCategory">Preferred Category</label>
+            <select id="matchCategory">
+              <option value="">Any</option>
+              <option value="Cooked Meals">🍛 Cooked Meals</option>
+              <option value="Fruits">🍎 Fruits</option>
+              <option value="Vegetables">🥦 Vegetables</option>
+              <option value="Packaged Food">📦 Packaged Food</option>
+              <option value="Bakery Items">🥐 Bakery Items</option>
+              <option value="Other">🥡 Other</option>
+            </select>
+          </div>
+          <div class="form-group" style="min-width:160px;">
+            <label for="matchLocation">Your Location / Area</label>
+            <input type="text" id="matchLocation" placeholder="e.g. City College" />
+          </div>
+          <div class="form-group" style="min-width:180px;">
+            <label for="matchTime">Preferred Pickup Time</label>
+            <input type="datetime-local" id="matchTime" />
+          </div>
+          <div style="display:flex;align-items:flex-end;">
+            <button class="btn btn-amber btn-sm" id="runMatchBtn">🤖 Find Matches</button>
+          </div>
+        </div>
+        <div id="matchResults" aria-live="polite"></div>
+      </div>
+
+      <!-- ── Listings Grid ── -->
+      <div class="donations-grid" id="donationsGrid" role="list" aria-label="Food donation listings">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DASHBOARD SECTION
+  ============================================================ -->
+  <section id="dashboard" class="section" aria-labelledby="dash-title">
+    <div class="container">
+      <h2 class="section-title" id="dash-title">📊 Impact Dashboard</h2>
+      <p class="section-desc">
+        A snapshot of the demonstration platform's activity.
+      </p>
+      <div class="demo-notice" role="note">
+        <span aria-hidden="true">📌</span>
+        <span>
+          All figures below are based on demonstration sample data.
+          They do <strong>not</strong> represent real community activity.
+          Estimated meals assume 0.5 kg of food per meal.
+        </span>
+      </div>
+      <div class="dashboard-grid" id="dashGrid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOD SAFETY SECTION
+  ============================================================ -->
+  <section id="safety" class="section section-alt" aria-labelledby="safety-title">
+    <div class="container">
+      <h2 class="section-title" id="safety-title">🛡️ Food Safety &amp; Responsible Donation</h2>
+      <p class="section-desc">
+        Food safety is everyone's responsibility. Please read these guidelines before donating or collecting food.
+      </p>
+      <div class="safety-grid">
+        <div class="safety-card">
+          <div class="safety-icon" aria-hidden="true">✅</div>
+          <h3 class="safety-title">Only Donate Safe Food</h3>
+          <p class="safety-desc">
+            Donate food that is clean, properly stored, and genuinely suitable for consumption.
+            Do not donate food that is expired, spoiled, contaminated, or has been improperly handled or stored.
+          </p>
+        </div>
+        <div class="safety-card">
+          <div class="safety-icon" aria-hidden="true">🌡️</div>
+          <h3 class="safety-title">Correct Storage &amp; Temperature</h3>
+          <p class="safety-desc">
+            Perishable foods such as cooked meals, dairy, and meat must be kept at safe temperatures
+            during storage and transport. Hot food should stay hot; cold food should stay cold.
+          </p>
+        </div>
+        <div class="safety-card">
+          <div class="safety-icon" aria-hidden="true">⏰</div>
+          <h3 class="safety-title">Expiry Is Only One Factor</h3>
+          <p class="safety-desc">
+            Expiry or best-before dates alone do not determine food safety.
+            Storage conditions, packaging integrity, handling, and appearance all matter.
+            Use good judgement and follow applicable food safety guidance.
+          </p>
+        </div>
+        <div class="safety-card">
+          <div class="safety-icon" aria-hidden="true">⚠️</div>
+          <h3 class="safety-title">Declare Allergens</h3>
+          <p class="safety-desc">
+            Always declare known allergens such as nuts, dairy, gluten, and eggs.
+            Recipients may have serious food allergies.
+            Provide ingredient information where available.
+          </p>
+        </div>
+        <div class="safety-card">
+          <div class="safety-icon" aria-hidden="true">📦</div>
+          <h3 class="safety-title">Proper Packaging</h3>
+          <p class="safety-desc">
+            Pack food in sealed, clean containers. Avoid loose or open packaging for
+            cooked meals and fresh produce. Label containers clearly with contents and date.
+          </p>
+        </div>
+        <div class="safety-card">
+          <div class="safety-icon" aria-hidden="true">🏛️</div>
+          <h3 class="safety-title">Follow Local Regulations</h3>
+          <p class="safety-desc">
+            Food donation laws and requirements vary by location.
+            This application does not verify compliance with local regulations.
+            Donors and recipients are responsible for following applicable laws.
+          </p>
+        </div>
+      </div>
+      <div class="warning-box" role="note">
+        <p>
+          <strong>⚠️ Important Disclaimer:</strong>
+          This application does not independently verify food quality, safety, or suitability.
+          Submitting a donation through this platform does not certify that the food is safe to eat.
+          All parties must exercise their own judgement and follow food safety best practices.
+          This prototype is a demonstration tool for educational purposes.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ABOUT SECTION
+  ============================================================ -->
+  <section id="about" class="section" aria-labelledby="about-title">
+    <div class="container">
+      <h2 class="section-title" id="about-title">ℹ️ About Smart Food Rescue Network</h2>
+      <p class="section-desc">
+        A college hackathon project demonstrating how technology can connect surplus food with communities in need,
+        reduce food waste, and promote environmental sustainability.
+      </p>
+      <div class="about-grid">
+        <div class="about-card">
+          <div class="icon" aria-hidden="true">🌿</div>
+          <h3>Mission</h3>
+          <p>Prevent edible food from going to waste by connecting donors with NGOs, volunteers, and community kitchens.</p>
+        </div>
+        <div class="about-card">
+          <div class="icon" aria-hidden="true">💡</div>
+          <h3>Technology</h3>
+          <p>Built with HTML, CSS, and JavaScript. Runs entirely in your browser. No server or internet required.</p>
+        </div>
+        <div class="about-card">
+          <div class="icon" aria-hidden="true">🔒</div>
+          <h3>Privacy</h3>
+          <p>All data stays in your browser's local storage. Nothing is sent to external servers.</p>
+        </div>
+        <div class="about-card">
+          <div class="icon" aria-hidden="true">🚀</div>
+          <h3>Future Vision</h3>
+          <p>A real-time shared network with backend integration, live maps, NGO verification, and push notifications.</p>
+        </div>
+      </div>
+
+      <!-- Clear Demo Data -->
+      <div style="margin-top:2rem;">
+        <h3 style="color:var(--white);margin-bottom:0.5rem;">🗑️ Manage Demonstration Data</h3>
+        <p style="color:var(--green-pale);font-size:0.88rem;margin-bottom:1rem;">
+          Browser local storage is not a secure database. Clear demonstration data at any time.
+          <br><em>Note: local storage may be accessible to other users sharing the same browser profile.</em>
+        </p>
+        <button class="btn btn-amber btn-sm" id="clearDataBtn">🗑️ Clear All Demonstration Data</button>
+        <div id="clearConfirm" class="confirm-box hidden">
+          <p>⚠️ This will permanently delete all donations and pickup requests from this browser's storage. Are you sure?</p>
+          <div class="confirm-actions">
+            <button class="btn btn-danger btn-sm" id="confirmClearBtn">Yes, Delete Everything</button>
+            <button class="btn btn-outline btn-sm" id="cancelClearBtn" style="border-color:#fff;color:#fff;">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer>
+    <p>
+      🌿 <strong>Smart Food Rescue Network</strong> — College Hackathon Demonstration Project &nbsp;|&nbsp;
+      Built with HTML, CSS &amp; JavaScript &nbsp;|&nbsp;
+      <a href="#home">Back to Top ↑</a>
+    </p>
+    <p style="margin-top:0.4rem;">
+      ⚠️ This is a prototype for educational purposes only. All data shown is simulated.
+    </p>
+  </footer>
+
+  <!-- ============================================================
+       PICKUP REQUEST MODAL
+  ============================================================ -->
+  <div class="modal-overlay hidden" id="pickupModal" role="dialog" aria-modal="true" aria-labelledby="pickupModalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="pickupModalTitle">🚚 Request Pickup</h2>
+        <button class="modal-close" id="closePickupModal" aria-label="Close pickup request form">✕</button>
+      </div>
+
+      <!-- Donation summary inside modal -->
+      <div class="donation-detail" id="pickupDonationDetail" aria-live="polite"></div>
+
+      <div class="demo-notice" role="note">
+        <span aria-hidden="true">⚠️</span>
+        <span>This is a simulated pickup request for demonstration only. No real coordination occurs.</span>
+      </div>
+
+      <form id="pickupForm" novalidate aria-label="Pickup request form">
+        <input type="hidden" id="pickupDonationId" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="requesterName">Your Name / Organisation <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="requesterName" placeholder="e.g. Hope Foundation NGO" required aria-required="true" />
+            <span class="field-error hidden" id="err-requesterName" role="alert"></span>
+          </div>
+          <div class="form-group">
+            <label for="requesterContact">Contact (Phone / Email) <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="requesterContact" placeholder="e.g. 9876543210" required aria-required="true" />
+            <span class="field-error hidden" id="err-requesterContact" role="alert"></span>
+          </div>
+          <div class="form-group full-width">
+            <label for="pickupTime">Intended Pickup Time <span class="req" aria-hidden="true">*</span></label>
+            <input type="datetime-local" id="pickupTime" required aria-required="true" />
+            <span class="field-error hidden" id="err-pickupTime" role="alert"></span>
+          </div>
+          <div class="form-group full-width">
+            <label for="pickupNote">Additional Notes (optional)</label>
+            <textarea id="pickupNote" rows="2" placeholder="Vehicle type, special requirements, etc."></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-green">✅ Confirm Request</button>
+          <button type="button" class="btn btn-outline" id="cancelPickupBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       DONATION DETAIL MODAL
+  ============================================================ -->
+  <div class="modal-overlay hidden" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="detailModalTitle">🍱 Donation Details</h2>
+        <button class="modal-close" id="closeDetailModal" aria-label="Close donation details">✕</button>
+      </div>
+      <div id="detailContent"></div>
+      <div class="form-actions" style="margin-top:1.25rem;" id="detailActions"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TOAST NOTIFICATIONS
+  ============================================================ -->
+  <div id="toast" aria-live="assertive" aria-atomic="true"></div>
+
+
+  <!-- ============================================================
+       JAVASCRIPT
+       All functions are commented to explain what they do.
+       Perfect for beginners to read and learn from!
+  ============================================================ -->
+  <script>
+    "use strict";
+
+    // ──────────────────────────────────────────────────────────────
+    // 1. CONSTANTS & CONFIGURATION
+    // ──────────────────────────────────────────────────────────────
+
+    // Key used to save data in the browser's localStorage
+    const STORAGE_KEY = "sfrn_donations";
+
+    // Emoji icons for each food category (used on donation cards)
+    const CATEGORY_ICONS = {
+      "Cooked Meals":  "🍛",
+      "Fruits":        "🍎",
+      "Vegetables":    "🥦",
+      "Packaged Food": "📦",
+      "Bakery Items":  "🥐",
+      "Other":         "🥡"
+    };
+
+    // Possible donation statuses
+    const STATUS = {
+      AVAILABLE:  "Available",
+      REQUESTED:  "Pickup Requested",
+      COLLECTED:  "Collected"
+    };
+
+    // ──────────────────────────────────────────────────────────────
+    // 2. SAMPLE / DEMO DONATIONS
+    //    These are pre-loaded example records so the app looks
+    //    functional when you first open it.
+    //    They are clearly labelled as demonstration data.
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * Returns an array of realistic sample donation objects.
+     * Each object has the same shape as a real donation.
+     */
+    function getSampleDonations() {
+      const now  = Date.now();
+      const h    = 3600000; // 1 hour in milliseconds
+
+      return [
+        {
+          id:             "demo-001",
+          donorName:      "Green Campus Café",
+          donorContact:   "cafe@greencampus.edu",
+          foodName:       "Vegetable Biryani",
+          foodCategory:   "Cooked Meals",
+          foodDesc:       "Freshly cooked veg biryani from today's college event. Contains rice, mixed vegetables, and mild spices. Nut-free.",
+          quantity:       "15 kg (approx. 30 portions)",
+          vegType:        "Vegetarian",
+          prepDate:       new Date(now - 2 * h).toISOString(),
+          expiryDate:     new Date(now + 4 * h).toISOString(),
+          pickupLocation: "Block B Canteen, City College, MG Road",
+          pickupFrom:     new Date(now).toISOString(),
+          pickupUntil:    new Date(now + 3 * h).toISOString(),
+          safetyNotes:    "Stored in covered containers. Hot hold above 60°C. Collect with insulated carriers.",
+          status:         STATUS.AVAILABLE,
+          isDemo:         true,
+          createdAt:      new Date(now - 2 * h).toISOString()
+        },
+        {
+          id:             "demo-002",
+          donorName:      "Fresh Mart Grocery",
+          donorContact:   "9876001234",
+          foodName:       "Assorted Seasonal Fruits",
+          foodCategory:   "Fruits",
+          foodDesc:       "Mixed bananas, apples, and oranges. Slightly overripe but perfectly edible. No known allergens.",
+          quantity:       "8 kg",
+          vegType:        "Vegan",
+          prepDate:       "",
+          expiryDate:     new Date(now + 24 * h).toISOString(),
+          pickupLocation: "Fresh Mart, Station Road, Sector 12",
+          pickupFrom:     new Date(now + 1 * h).toISOString(),
+          pickupUntil:    new Date(now + 6 * h).toISOString(),
+          safetyNotes:    "Store at room temperature. Do not refrigerate bananas.",
+          status:         STATUS.AVAILABLE,
+          isDemo:         true,
+          createdAt:      new Date(now - 5 * h).toISOString()
+        },
+        {
+          id:             "demo-003",
+          donorName:      "Happy Bakers",
+          donorContact:   "happybakers@email.com",
+          foodName:       "Day-Old Bread & Pastries",
+          foodCategory:   "Bakery Items",
+          foodDesc:       "Unsold loaves, croissants, and muffins from today. Still fresh and soft. Contains gluten, dairy, eggs.",
+          quantity:       "4 kg (mixed assortment)",
+          vegType:        "Vegetarian",
+          prepDate:       new Date(now - 8 * h).toISOString(),
+          expiryDate:     new Date(now + 12 * h).toISOString(),
+          pickupLocation: "Happy Bakers, Park Street, Near City Bus Stand",
+          pickupFrom:     new Date(now).toISOString(),
+          pickupUntil:    new Date(now + 2 * h).toISOString(),
+          safetyNotes:    "Best consumed today. Allergens: Gluten, Dairy, Eggs.",
+          status:         STATUS.REQUESTED,
+          isDemo:         true,
+          createdAt:      new Date(now - 8 * h).toISOString(),
+          pickup: {
+            requesterName:    "Sunshine Children's Home",
+            requesterContact: "9811223344",
+            pickupTime:       new Date(now + 1 * h).toISOString(),
+            pickupNote:       "Will bring volunteers with bags."
+          }
+        },
+        {
+          id:             "demo-004",
+          donorName:      "Sunrise Community Kitchen",
+          donorContact:   "kitchen@sunrise.org",
+          foodName:       "Dal & Rice Meals",
+          foodCategory:   "Cooked Meals",
+          foodDesc:       "Surplus meals from community lunch service. Yellow dal, steamed rice, pickle. Vegan-friendly.",
+          quantity:       "25 portions",
+          vegType:        "Vegan",
+          prepDate:       new Date(now - 1 * h).toISOString(),
+          expiryDate:     new Date(now + 3 * h).toISOString(),
+          pickupLocation: "Sunrise Community Kitchen, Gandhi Nagar",
+          pickupFrom:     new Date(now).toISOString(),
+          pickupUntil:    new Date(now + 2 * h).toISOString(),
+          safetyNotes:    "Hot food, handle carefully. Pack in insulated containers. Collect before 3:00 PM.",
+          status:         STATUS.AVAILABLE,
+          isDemo:         true,
+          createdAt:      new Date(now - 1 * h).toISOString()
+        },
+        {
+          id:             "demo-005",
+          donorName:      "Organic Greens Farm",
+          donorContact:   "9900112233",
+          foodName:       "Mixed Vegetables",
+          foodCategory:   "Vegetables",
+          foodDesc:       "Surplus from today's market: tomatoes, spinach, carrots, and capsicum. Market-fresh.",
+          quantity:       "12 kg",
+          vegType:        "Vegan",
+          prepDate:       "",
+          expiryDate:     new Date(now + 48 * h).toISOString(),
+          pickupLocation: "Organic Greens Stall, Central Market, Ring Road",
+          pickupFrom:     new Date(now + 2 * h).toISOString(),
+          pickupUntil:    new Date(now + 10 * h).toISOString(),
+          safetyNotes:    "Keep cool and dry. Wash before use.",
+          status:         STATUS.AVAILABLE,
+          isDemo:         true,
+          createdAt:      new Date(now - 3 * h).toISOString()
+        },
+        {
+          id:             "demo-006",
+          donorName:      "QuickBite Packaged Foods",
+          donorContact:   "quickbite@foods.in",
+          foodName:       "Assorted Biscuits & Namkeen",
+          foodCategory:   "Packaged Food",
+          foodDesc:       "Surplus stock near best-before date. Original sealed packaging. Variety of brands.",
+          quantity:       "30 packets",
+          vegType:        "Vegetarian",
+          prepDate:       "",
+          expiryDate:     new Date(now + 72 * h).toISOString(),
+          pickupLocation: "QuickBite Warehouse, Industrial Area, Phase 2",
+          pickupFrom:     new Date(now + 4 * h).toISOString(),
+          pickupUntil:    new Date(now + 30 * h).toISOString(),
+          safetyNotes:    "All in original sealed packaging. Check individual pack dates before distributing.",
+          status:         STATUS.COLLECTED,
+          isDemo:         true,
+          createdAt:      new Date(now - 24 * h).toISOString(),
+          pickup: {
+            requesterName:    "Helping Hands NGO",
+            requesterContact: "helpinghands@ngo.org",
+            pickupTime:       new Date(now - 2 * h).toISOString(),
+            pickupNote:       "Collected successfully. Distributed to 60 families."
+          }
+        }
+      ];
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 3. STATE — the in-memory array of all donations
+    // ──────────────────────────────────────────────────────────────
+
+    let donations = []; // Main data array — always kept in sync with localStorage
+
+    // ──────────────────────────────────────────────────────────────
+    // 4. LOCAL STORAGE FUNCTIONS
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * loadDonations()
+     * Reads donations from localStorage.
+     * If no data exists yet, it loads the sample demo donations.
+     * This runs once when the page first loads.
+     */
+    function loadDonations() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          donations = JSON.parse(stored); // Parse saved JSON text back into an array
+        } catch (e) {
+          // If saved data is corrupted, start fresh with demo data
+          console.warn("Could not parse saved data. Loading demo data.");
+          donations = getSampleDonations();
+          saveDonations();
+        }
+      } else {
+        // First time visiting — load the demo examples
+        donations = getSampleDonations();
+        saveDonations();
+      }
+    }
+
+    /**
+     * saveDonations()
+     * Converts the donations array to a JSON string and saves it to localStorage.
+     * Call this every time the donations array changes.
+     */
+    function saveDonations() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(donations));
+    }
+
+    /**
+     * clearDemoData()
+     * Deletes ALL donation data from localStorage and resets to an empty state.
+     * Only called after the user confirms they want to delete everything.
+     */
+    function clearDemoData() {
+      localStorage.removeItem(STORAGE_KEY);
+      donations = [];
+      saveDonations();
+      renderDonations(donations);
+      updateDashboard();
+      updateStatsStrip();
+      showToast("✅ All demonstration data has been cleared.", "success");
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 5. HELPER / FORMATTING FUNCTIONS
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * generateId()
+     * Creates a short unique ID for each new donation.
+     */
+    function generateId() {
+      return "sfrn-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
+    }
+
+    /**
+     * formatDateTime(isoString)
+     * Converts an ISO date string (e.g. "2025-06-01T14:30:00.000Z")
+     * into a human-readable format like "1 Jun 2025, 2:30 PM".
+     */
+    function formatDateTime(isoString) {
+      if (!isoString) return "Not specified";
+      const d = new Date(isoString);
+      if (isNaN(d)) return "Invalid date";
+      return d.toLocaleString("en-IN", {
+        day: "numeric", month: "short", year: "numeric",
+        hour: "2-digit", minute: "2-digit"
+      });
+    }
+
+    /**
+     * isExpiringSoon(isoString)
+     * Returns true if the expiry date is within the next 3 hours.
+     * Used to show an urgency badge on food cards.
+     */
+    function isExpiringSoon(isoString) {
+      if (!isoString) return false;
+      const expiry = new Date(isoString).getTime();
+      const now    = Date.now();
+      return expiry > now && (expiry - now) < 3 * 3600 * 1000; // 3 hours
+    }
+
+    /**
+     * isExpired(isoString)
+     * Returns true if the given date is in the past.
+     */
+    function isExpired(isoString) {
+      if (!isoString) return false;
+      return new Date(isoString).getTime() < Date.now();
+    }
+
+    /**
+     * getStatusBadgeClass(status)
+     * Returns a CSS class name based on the donation status.
+     */
+    function getStatusBadgeClass(status) {
+      if (status === STATUS.AVAILABLE)  return "badge-green";
+      if (status === STATUS.REQUESTED)  return "badge-amber";
+      if (status === STATUS.COLLECTED)  return "badge-gray";
+      return "badge-gray";
+    }
+
+    /**
+     * showToast(message, type)
+     * Displays a small notification banner at the bottom-right of the screen.
+     * type can be: "success", "error", or "info"
+     * The toast disappears automatically after 3.5 seconds.
+     */
+    function showToast(message, type = "success") {
+      const toast   = document.getElementById("toast");
+      const div     = document.createElement("div");
+      div.className = `toast-msg toast-${type}`;
+      div.textContent = message;
+      div.setAttribute("role", "status");
+      toast.appendChild(div);
+      // Remove after 3.5 seconds
+      setTimeout(() => { if (div.parentNode) toast.removeChild(div); }, 3500);
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 6. RENDER FUNCTIONS — build and display HTML from data
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * renderDonations(list)
+     * Takes an array of donation objects and creates HTML cards for each one.
+     * Inserts the cards into the #donationsGrid element on the page.
+     */
+    function renderDonations(list) {
+      const grid = document.getElementById("donationsGrid");
+      grid.innerHTML = ""; // Clear existing cards first
+
+      if (list.length === 0) {
+        // Show a friendly message if there are no donations to display
+        grid.innerHTML = `
+          <div class="empty-state" role="status">
+            <div class="icon" aria-hidden="true">🍽️</div>
+            <p><strong>No donations found.</strong></p>
+            <p>Try clearing your filters, or be the first to <a href="#donate">donate food</a>!</p>
+          </div>`;
+        return;
+      }
+
+      list.forEach(donation => {
+        const icon         = CATEGORY_ICONS[donation.foodCategory] || "🥡";
+        const statusClass  = getStatusBadgeClass(donation.status);
+        const expireSoon   = isExpiringSoon(donation.expiryDate);
+        const expired      = isExpired(donation.expiryDate);
+        const demoLabel    = donation.isDemo ? ' <span class="badge badge-gray" title="Sample demonstration record">Demo</span>' : "";
+
+        // Build a card element
+        const card = document.createElement("article");
+        card.className  = "donation-card";
+        card.setAttribute("role", "listitem");
+        card.setAttribute("aria-label", `Donation: ${donation.foodName}`);
+
+        card.innerHTML = `
+          <div class="card-thumb" aria-hidden="true">${icon}</div>
+          <div class="card-body">
+            <div class="card-title">${escHtml(donation.foodName)} ${demoLabel}</div>
+            ${expireSoon && donation.status === STATUS.AVAILABLE
+              ? `<span class="urgency-tag" role="alert">⚡ Expiring Soon!</span>` : ""}
+            ${expired && donation.status === STATUS.AVAILABLE
+              ? `<span class="urgency-tag" style="background:var(--red-light);color:var(--red);" role="alert">❌ Past Deadline</span>` : ""}
+            <div class="card-meta">
+              <span>📂 ${escHtml(donation.foodCategory)}</span>
+              <span>⚖️ ${escHtml(donation.quantity)}</span>
+              <span>🌿 ${escHtml(donation.vegType || "—")}</span>
+              <span>📍 ${escHtml(donation.pickupLocation)}</span>
+              <span>⏰ Until: ${formatDateTime(donation.pickupUntil)}</span>
+              ${donation.expiryDate
+                ? `<span>🗓️ Best Before: ${formatDateTime(donation.expiryDate)}</span>`
+                : `<span style="color:var(--amber)">⚠️ No expiry info</span>`}
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="badge ${statusClass}">${escHtml(donation.status)}</span>
+            <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+              <button class="btn btn-outline btn-sm" onclick="openDetailModal('${donation.id}')">
+                👁️ View
+              </button>
+              ${donation.status === STATUS.AVAILABLE
+                ? `<button class="btn btn-green btn-sm" onclick="openPickupModal('${donation.id}')">
+                     🚚 Request Pickup
+                   </button>`
+                : ""}
+              ${donation.status === STATUS.REQUESTED
+                ? `<button class="btn btn-amber btn-sm" onclick="markCollected('${donation.id}')">
+                     ✅ Mark Collected
+                   </button>`
+                : ""}
+            </div>
+          </div>`;
+
+        grid.appendChild(card);
+      });
+    }
+
+    /**
+     * escHtml(str)
+     * Prevents HTML injection by escaping special characters.
+     * Always use this when inserting user-supplied text into HTML.
+     */
+    function escHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    /**
+     * updateDashboard()
+     * Calculates totals from the donations array and updates the
+     * impact dashboard cards with the latest figures.
+     */
+    function updateDashboard() {
+      const total     = donations.length;
+      const available = donations.filter(d => d.status === STATUS.AVAILABLE).length;
+      const requested = donations.filter(d => d.status === STATUS.REQUESTED).length;
+      const collected = donations.filter(d => d.status === STATUS.COLLECTED).length;
+
+      // Estimate meals: try to parse quantity as a number of kg
+      // Assumption: 1 kg of food ≈ 2 meals (or 0.5 kg per meal)
+      let totalKg = 0;
+      donations.forEach(d => {
+        const match = String(d.quantity || "").match(/(\d+(\.\d+)?)/);
+        if (match) totalKg += parseFloat(match[1]);
+      });
+      const mealsEstimate = Math.round(totalKg * 2);
+
+      const dashGrid = document.getElementById("dashGrid");
+      dashGrid.innerHTML = `
+        <div class="dash-card">
+          <div class="dash-icon" aria-hidden="true">📋</div>
+          <div class="dash-value">${total}</div>
+          <div class="dash-label">Total Donations Submitted</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-icon" aria-hidden="true">🟢</div>
+          <div class="dash-value">${available}</div>
+          <div class="dash-label">Available for Pickup</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-icon" aria-hidden="true">🚚</div>
+          <div class="dash-value">${requested}</div>
+          <div class="dash-label">Pickup Requests Received</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-icon" aria-hidden="true">✅</div>
+          <div class="dash-value">${collected}</div>
+          <div class="dash-label">Completed Pickups</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-icon" aria-hidden="true">🍽️</div>
+          <div class="dash-value">~${mealsEstimate}</div>
+          <div class="dash-label">Meals Potentially Rescued*</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-icon" aria-hidden="true">🌍</div>
+          <div class="dash-value">~${Math.round(totalKg)} kg</div>
+          <div class="dash-label">Food Waste Potentially Avoided*</div>
+        </div>`;
+    }
+
+    /**
+     * updateStatsStrip()
+     * Updates the smaller statistics strip shown just below the hero banner.
+     */
+    function updateStatsStrip() {
+      const available = donations.filter(d => d.status === STATUS.AVAILABLE).length;
+      const collected = donations.filter(d => d.status === STATUS.COLLECTED).length;
+      const donors    = new Set(donations.map(d => d.donorName)).size;
+
+      let totalKg = 0;
+      donations.forEach(d => {
+        const match = String(d.quantity || "").match(/(\d+(\.\d+)?)/);
+        if (match) totalKg += parseFloat(match[1]);
+      });
+
+      const strip = document.getElementById("statsStrip");
+      strip.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-value">${donations.length}</div>
+          <div class="stat-label">Donations Listed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${available}</div>
+          <div class="stat-label">Available Now</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${donors}</div>
+          <div class="stat-label">Active Donors</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${collected}</div>
+          <div class="stat-label">Completed Pickups</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">~${Math.round(totalKg * 2)}</div>
+          <div class="stat-label">Meals Potentially Rescued</div>
+        </div>`;
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 7. DONATION FORM HANDLING
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * validateField(id, message)
+     * Checks if a form field has a value. Shows an error message if not.
+     * Returns true if the field is valid, false if it is empty.
+     */
+    function validateField(id, message) {
+      const el  = document.getElementById(id);
+      const err = document.getElementById("err-" + id);
+      if (!el.value.trim()) {
+        if (err) { err.textContent = message; err.classList.remove("hidden"); }
+        el.setAttribute("aria-invalid", "true");
+        return false;
+      }
+      if (err) { err.textContent = ""; err.classList.add("hidden"); }
+      el.removeAttribute("aria-invalid");
+      return true;
+    }
+
+    /**
+     * clearErrors()
+     * Hides all error messages on the donation form.
+     * Called at the start of each validation attempt.
+     */
+    function clearErrors() {
+      document.querySelectorAll(".field-error").forEach(el => {
+        el.textContent = "";
+        el.classList.add("hidden");
+      });
+      document.querySelectorAll("[aria-invalid]").forEach(el => {
+        el.removeAttribute("aria-invalid");
+      });
+    }
+
+    /**
+     * handleDonationSubmit(event)
+     * Called when the donation form is submitted.
+     * Validates all required fields, builds a donation object,
+     * saves it to the donations array and localStorage,
+     * then updates the page.
+     */
+    function handleDonationSubmit(event) {
+      event.preventDefault(); // Prevent the page from reloading
+      clearErrors();
+
+      // Validate all required fields
+      let valid = true;
+      valid = validateField("donorName",      "Please enter the donor or organisation name.") && valid;
+      valid = validateField("donorContact",   "Please enter a contact phone number or email.")  && valid;
+      valid = validateField("foodName",       "Please enter the food name.")                    && valid;
+      valid = validateField("foodCategory",   "Please select a food category.")                 && valid;
+      valid = validateField("quantity",       "Please enter the available quantity.")            && valid;
+      valid = validateField("pickupLocation", "Please enter a pickup location.")                 && valid;
+      valid = validateField("pickupFrom",     "Please enter when pickup is available from.")     && valid;
+      valid = validateField("pickupUntil",    "Please enter when pickup availability ends.")     && valid;
+
+      if (!valid) {
+        showToast("⚠️ Please fill in all required fields.", "error");
+        // Scroll to the first error
+        const firstError = document.querySelector("[aria-invalid]");
+        if (firstError) firstError.focus();
+        return;
+      }
+
+      // Build the new donation object from form values
+      const newDonation = {
+        id:             generateId(),
+        donorName:      document.getElementById("donorName").value.trim(),
+        donorContact:   document.getElementById("donorContact").value.trim(),
+        foodName:       document.getElementById("foodName").value.trim(),
+        foodCategory:   document.getElementById("foodCategory").value,
+        foodDesc:       document.getElementById("foodDesc").value.trim(),
+        quantity:       document.getElementById("quantity").value.trim(),
+        vegType:        document.getElementById("vegType").value,
+        prepDate:       document.getElementById("prepDate").value,
+        expiryDate:     document.getElementById("expiryDate").value,
+        pickupLocation: document.getElementById("pickupLocation").value.trim(),
+        pickupFrom:     document.getElementById("pickupFrom").value,
+        pickupUntil:    document.getElementById("pickupUntil").value,
+        safetyNotes:    document.getElementById("safetyNotes").value.trim(),
+        status:         STATUS.AVAILABLE,
+        isDemo:         false,  // This is a real user submission
+        createdAt:      new Date().toISOString()
+      };
+
+      // Add to the donations array
+      donations.unshift(newDonation); // unshift = add to the beginning of the array
+      saveDonations();
+
+      // Reset the form and update the page
+      document.getElementById("donationForm").reset();
+      renderDonations(donations);
+      updateDashboard();
+      updateStatsStrip();
+
+      showToast("🎉 Your donation has been listed! Thank you for reducing food waste.", "success");
+
+      // Scroll the user to the food listings so they can see their new donation
+      setTimeout(() => {
+        document.getElementById("find").scrollIntoView({ behavior: "smooth" });
+      }, 500);
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 8. FILTER / SEARCH FUNCTIONS
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * filterDonations()
+     * Reads the values from the filter bar inputs and returns
+     * only the donations that match all the applied filters.
+     */
+    function filterDonations() {
+      const query    = document.getElementById("searchQuery").value.trim().toLowerCase();
+      const category = document.getElementById("filterCategory").value;
+      const status   = document.getElementById("filterStatus").value;
+      const location = document.getElementById("filterLocation").value.trim().toLowerCase();
+
+      return donations.filter(d => {
+        // Check each active filter — all must pass
+        const matchQuery    = !query    || d.foodName.toLowerCase().includes(query) || d.pickupLocation.toLowerCase().includes(query) || (d.foodDesc || "").toLowerCase().includes(query);
+        const matchCategory = !category || d.foodCategory === category;
+        const matchStatus   = !status   || d.status === status;
+        const matchLocation = !location || d.pickupLocation.toLowerCase().includes(location);
+
+        return matchQuery && matchCategory && matchStatus && matchLocation;
+      });
+    }
+
+    /**
+     * applyFilters()
+     * Runs filterDonations() and updates the donation grid with results.
+     */
+    function applyFilters() {
+      const filtered = filterDonations();
+      renderDonations(filtered);
+    }
+
+    /**
+     * clearFilters()
+     * Resets all filter inputs and shows all donations again.
+     */
+    function clearFilters() {
+      document.getElementById("searchQuery").value    = "";
+      document.getElementById("filterCategory").value = "";
+      document.getElementById("filterStatus").value   = "";
+      document.getElementById("filterLocation").value = "";
+      renderDonations(donations);
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 9. SMART FOOD MATCHING
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * matchDonations()
+     * The "smart matching" function. It scores each available donation
+     * based on how well it matches the user's preferences:
+     *   - Category match → +30 points
+     *   - Location keyword match → +25 points
+     *   - Pickup time within window → +20 points
+     *   - Urgency (expiring within 6 hours) → +15 points (prioritised)
+     *   - Status Available → +10 points
+     *
+     * NOTE: This is a simple scoring algorithm for demonstration.
+     * It does NOT calculate real distances. Location matching is
+     * done by checking if the user's location text appears in the
+     * pickup location string.
+     */
+    function matchDonations() {
+      const preferredCategory = document.getElementById("matchCategory").value;
+      const userLocation      = document.getElementById("matchLocation").value.trim().toLowerCase();
+      const pickupTimeStr     = document.getElementById("matchTime").value;
+      const preferredTime     = pickupTimeStr ? new Date(pickupTimeStr).getTime() : null;
+
+      const resultsDiv = document.getElementById("matchResults");
+
+      // Only consider available donations for matching
+      const candidates = donations.filter(d => d.status === STATUS.AVAILABLE);
+
+      if (candidates.length === 0) {
+        resultsDiv.innerHTML = `<p style="color:var(--text-light);">No available donations to match right now.</p>`;
+        return;
+      }
+
+      // Score each candidate
+      const scored = candidates.map(d => {
+        let score   = 0;
+        const reasons = [];
+
+        // 1. Category match
+        if (preferredCategory && d.foodCategory === preferredCategory) {
+          score += 30;
+          reasons.push("Matches your preferred food category.");
+        }
+
+        // 2. Location match (simple keyword search — not real GPS)
+        if (userLocation && d.pickupLocation.toLowerCase().includes(userLocation)) {
+          score += 25;
+          reasons.push("Pickup location matches your selected area.");
+        }
+
+        // 3. Pickup time compatibility
+        if (preferredTime) {
+          const fromTime  = d.pickupFrom  ? new Date(d.pickupFrom).getTime()  : null;
+          const untilTime = d.pickupUntil ? new Date(d.pickupUntil).getTime() : null;
+          if (fromTime && untilTime && preferredTime >= fromTime && preferredTime <= untilTime) {
+            score += 20;
+            reasons.push("Available during your requested pickup period.");
+          }
+        }
+
+        // 4. Urgency — expiring within 6 hours but not yet expired
+        const sixH = 6 * 3600 * 1000;
+        if (d.expiryDate) {
+          const timeLeft = new Date(d.expiryDate).getTime() - Date.now();
+          if (timeLeft > 0 && timeLeft < sixH) {
+            score += 15;
+            reasons.push("⚡ Expiring soon — prioritised to reduce waste.");
+          }
+        }
+
+        // 5. Basic availability
+        if (d.status === STATUS.AVAILABLE) {
+          score += 10;
+          reasons.push("Suitable quantity available.");
+        }
+
+        // If no preferences were entered, give everyone a base score
+        if (!preferredCategory && !userLocation && !preferredTime) {
+          score   = 10;
+          reasons.push("Suitable quantity available.");
+        }
+
+        return { donation: d, score, reasons };
+      });
+
+      // Sort by score, highest first
+      scored.sort((a, b) => b.score - a.score);
+
+      // Take top 4 results
+      const topMatches = scored.filter(s => s.score > 0).slice(0, 4);
+
+      if (topMatches.length === 0) {
+        resultsDiv.innerHTML = `<p style="color:var(--text-light);">No strong matches found. Try adjusting your preferences or clear the filters.</p>`;
+        return;
+      }
+
+      // Build the match results HTML
+      let html = `<h4 style="margin-bottom:0.75rem;color:var(--green-dark);">🏆 Top Matches for You</h4>`;
+      topMatches.forEach((m, idx) => {
+        const icon = CATEGORY_ICONS[m.donation.foodCategory] || "🥡";
+        html += `
+          <div class="match-card">
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.4rem;">
+              <span style="font-size:1.8rem;" aria-hidden="true">${icon}</span>
+              <div>
+                <strong>${escHtml(m.donation.foodName)}</strong>
+                <span class="badge badge-green" style="margin-left:0.4rem;">#${idx + 1} Match</span>
+                <div style="font-size:0.8rem;color:var(--text-light);">
+                  📍 ${escHtml(m.donation.pickupLocation)} &nbsp;|&nbsp;
+                  ⚖️ ${escHtml(m.donation.quantity)}
+                </div>
+              </div>
+            </div>
+            <ul class="match-reasons">
+              ${m.reasons.map(r => `<li>${escHtml(r)}</li>`).join("")}
+            </ul>
+            <button class="btn btn-green btn-sm" style="margin-top:0.6rem;"
+              onclick="openPickupModal('${m.donation.id}')">
+              🚚 Request Pickup
+            </button>
+          </div>`;
+      });
+
+      resultsDiv.innerHTML = html;
+      resultsDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 10. PICKUP REQUEST SYSTEM
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * openPickupModal(donationId)
+     * Opens the pickup request modal for a specific donation.
+     * Displays the donation details inside the modal for reference.
+     */
+    function openPickupModal(donationId) {
+      const donation = donations.find(d => d.id === donationId);
+      if (!donation) return;
+
+      // Fill in the donation summary inside the modal
+      document.getElementById("pickupDonationId").value = donationId;
+      document.getElementById("pickupDonationDetail").innerHTML = `
+        <p><strong>Food:</strong> ${escHtml(donation.foodName)}</p>
+        <p><strong>Category:</strong> ${escHtml(donation.foodCategory)}</p>
+        <p><strong>Quantity:</strong> ${escHtml(donation.quantity)}</p>
+        <p><strong>Pickup Location:</strong> ${escHtml(donation.pickupLocation)}</p>
+        <p><strong>Available Until:</strong> ${formatDateTime(donation.pickupUntil)}</p>
+        <p><strong>Donor:</strong> ${escHtml(donation.donorName)}</p>`;
+
+      // Reset the pickup form
+      document.getElementById("pickupForm").reset();
+      document.getElementById("pickupDonationId").value = donationId;
+
+      // Show the modal
+      document.getElementById("pickupModal").classList.remove("hidden");
+      document.getElementById("requesterName").focus();
+    }
+
+    /**
+     * closePickupModal()
+     * Hides the pickup request modal.
+     */
+    function closePickupModal() {
+      document.getElementById("pickupModal").classList.add("hidden");
+    }
+
+    /**
+     * requestPickup(event)
+     * Called when the pickup request form is submitted.
+     * Validates the form, updates the donation's status to
+     * "Pickup Requested", attaches the pickup details, and saves.
+     */
+    function requestPickup(event) {
+      event.preventDefault();
+      clearPickupErrors();
+
+      const donationId = document.getElementById("pickupDonationId").value;
+
+      // Validate required fields
+      let valid = true;
+      valid = validatePickupField("requesterName",    "Please enter your name or organisation.") && valid;
+      valid = validatePickupField("requesterContact", "Please enter your contact details.")       && valid;
+      valid = validatePickupField("pickupTime",       "Please enter your intended pickup time.")  && valid;
+
+      if (!valid) {
+        showToast("⚠️ Please fill in all required fields.", "error");
+        return;
+      }
+
+      // Find the donation and update it
+      const idx = donations.findIndex(d => d.id === donationId);
+      if (idx === -1) {
+        showToast("❌ Could not find this donation. Please try again.", "error");
+        return;
+      }
+
+      // Check if a pickup was already requested (prevent duplicates)
+      if (donations[idx].status !== STATUS.AVAILABLE) {
+        showToast("ℹ️ A pickup has already been requested for this donation.", "info");
+        closePickupModal();
+        return;
+      }
+
+      // Attach pickup details to the donation
+      donations[idx].status  = STATUS.REQUESTED;
+      donations[idx].pickup  = {
+        requesterName:    document.getElementById("requesterName").value.trim(),
+        requesterContact: document.getElementById("requesterContact").value.trim(),
+        pickupTime:       document.getElementById("pickupTime").value,
+        pickupNote:       document.getElementById("pickupNote").value.trim()
+      };
+
+      saveDonations();
+      renderDonations(donations);
+      updateDashboard();
+      updateStatsStrip();
+      closePickupModal();
+
+      showToast("🚚 Pickup request submitted! The donor will be notified (simulated).", "success");
+    }
+
+    /** Helper: validate a field inside the pickup modal */
+    function validatePickupField(id, message) {
+      const el  = document.getElementById(id);
+      const err = document.getElementById("err-" + id);
+      if (!el.value.trim()) {
+        if (err) { err.textContent = message; err.classList.remove("hidden"); }
+        el.setAttribute("aria-invalid", "true");
+        return false;
+      }
+      if (err) { err.textContent = ""; err.classList.add("hidden"); }
+      el.removeAttribute("aria-invalid");
+      return true;
+    }
+
+    /** Helper: clear all error messages in the pickup modal */
+    function clearPickupErrors() {
+      ["requesterName", "requesterContact", "pickupTime"].forEach(id => {
+        const err = document.getElementById("err-" + id);
+        if (err) { err.textContent = ""; err.classList.add("hidden"); }
+        const el = document.getElementById(id);
+        if (el) el.removeAttribute("aria-invalid");
+      });
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 11. UPDATE DONATION STATUS
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * updateDonationStatus(donationId, newStatus)
+     * Changes the status of a donation and saves the update.
+     * Called when a donation is marked as "Collected".
+     */
+    function updateDonationStatus(donationId, newStatus) {
+      const idx = donations.findIndex(d => d.id === donationId);
+      if (idx === -1) return;
+      donations[idx].status = newStatus;
+      saveDonations();
+      renderDonations(donations);
+      updateDashboard();
+      updateStatsStrip();
+    }
+
+    /**
+     * markCollected(donationId)
+     * Convenience function called by the "Mark Collected" button on donation cards.
+     */
+    function markCollected(donationId) {
+      updateDonationStatus(donationId, STATUS.COLLECTED);
+      showToast("✅ Donation marked as Collected. Great work!", "success");
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 12. DONATION DETAIL MODAL
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * openDetailModal(donationId)
+     * Shows a full-detail view of a donation in a popup modal.
+     */
+    function openDetailModal(donationId) {
+      const d = donations.find(d => d.id === donationId);
+      if (!d) return;
+
+      const icon         = CATEGORY_ICONS[d.foodCategory] || "🥡";
+      const statusClass  = getStatusBadgeClass(d.status);
+      const expireSoon   = isExpiringSoon(d.expiryDate);
+      const expired      = isExpired(d.expiryDate);
+
+      document.getElementById("detailModalTitle").textContent = `${icon} ${d.foodName}`;
+
+      let safetyWarning = "";
+      if (!d.expiryDate) {
+        safetyWarning = `<div class="demo-notice" role="alert"><span>⚠️</span><span><strong>No expiry information provided.</strong> Recipients should exercise caution and assess food condition before distributing.</span></div>`;
+      } else if (expired) {
+        safetyWarning = `<div class="demo-notice" style="background:var(--red-light);border-color:var(--red);" role="alert"><span>❌</span><span><strong>Past the safe consumption deadline.</strong> This food should not be collected or distributed.</span></div>`;
+      } else if (expireSoon) {
+        safetyWarning = `<div class="demo-notice" role="alert"><span>⚡</span><span><strong>Expiring very soon!</strong> Prioritise immediate collection and distribution if still suitable.</span></div>`;
+      }
+
+      document.getElementById("detailContent").innerHTML = `
+        ${safetyWarning}
+        <div class="donation-detail">
+          <p><strong>Food Name:</strong> ${escHtml(d.foodName)}</p>
+          <p><strong>Category:</strong> ${escHtml(d.foodCategory)}</p>
+          <p><strong>Quantity:</strong> ${escHtml(d.quantity)}</p>
+          <p><strong>Type:</strong> ${escHtml(d.vegType || "Not specified")}</p>
+          <p><strong>Description:</strong> ${escHtml(d.foodDesc || "No description provided.")}</p>
+          <p><strong>Prepared / Packaged:</strong> ${formatDateTime(d.prepDate)}</p>
+          <p><strong>Safe Consumption Deadline:</strong> ${d.expiryDate ? formatDateTime(d.expiryDate) : "Not provided ⚠️"}</p>
+          <p><strong>Pickup Location:</strong> ${escHtml(d.pickupLocation)}</p>
+          <p><strong>Pickup Available:</strong> ${formatDateTime(d.pickupFrom)} → ${formatDateTime(d.pickupUntil)}</p>
+          <p><strong>Safety Notes:</strong> ${escHtml(d.safetyNotes || "None provided.")}</p>
+          <p><strong>Donor:</strong> ${escHtml(d.donorName)}</p>
+          <p><strong>Contact:</strong> ${escHtml(d.donorContact)}</p>
+          <p><strong>Status:</strong> <span class="badge ${statusClass}">${escHtml(d.status)}</span></p>
+          ${d.isDemo ? '<p><em>📌 This is a sample demonstration record.</em></p>' : ""}
+        </div>
+        ${d.pickup ? `
+          <div style="background:var(--amber-light);border-radius:var(--radius-sm);padding:0.75rem;margin-top:0.5rem;">
+            <strong>🚚 Pickup Request Details</strong>
+            <p style="font-size:0.85rem;margin-top:0.4rem;"><strong>Requested By:</strong> ${escHtml(d.pickup.requesterName)}</p>
+            <p style="font-size:0.85rem;"><strong>Contact:</strong> ${escHtml(d.pickup.requesterContact)}</p>
+            <p style="font-size:0.85rem;"><strong>Pickup Time:</strong> ${formatDateTime(d.pickup.pickupTime)}</p>
+            ${d.pickup.pickupNote ? `<p style="font-size:0.85rem;"><strong>Notes:</strong> ${escHtml(d.pickup.pickupNote)}</p>` : ""}
+          </div>` : ""}`;
+
+      // Action buttons inside detail modal
+      const actionsDiv = document.getElementById("detailActions");
+      actionsDiv.innerHTML = "";
+      if (d.status === STATUS.AVAILABLE) {
+        const reqBtn = document.createElement("button");
+        reqBtn.className = "btn btn-green";
+        reqBtn.innerHTML = "🚚 Request Pickup";
+        reqBtn.onclick = () => { closeDetailModal(); openPickupModal(d.id); };
+        actionsDiv.appendChild(reqBtn);
+      }
+      if (d.status === STATUS.REQUESTED) {
+        const colBtn = document.createElement("button");
+        colBtn.className = "btn btn-amber";
+        colBtn.innerHTML = "✅ Mark as Collected";
+        colBtn.onclick = () => { markCollected(d.id); closeDetailModal(); };
+        actionsDiv.appendChild(colBtn);
+      }
+      const closeBtn = document.createElement("button");
+      closeBtn.className = "btn btn-outline";
+      closeBtn.innerHTML = "✕ Close";
+      closeBtn.onclick = closeDetailModal;
+      actionsDiv.appendChild(closeBtn);
+
+      document.getElementById("detailModal").classList.remove("hidden");
+    }
+
+    /**
+     * closeDetailModal()
+     * Hides the donation detail modal.
+     */
+    function closeDetailModal() {
+      document.getElementById("detailModal").classList.add("hidden");
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 13. NAVIGATION
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * setupNavigation()
+     * Sets up the mobile hamburger menu toggle.
+     * Also highlights the active nav link based on scroll position.
+     */
+    function setupNavigation() {
+      const toggle = document.getElementById("navToggle");
+      const links  = document.getElementById("navLinks");
+
+      toggle.addEventListener("click", () => {
+        const isOpen = links.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", isOpen.toString());
+      });
+
+      // Close mobile menu when a link is clicked
+      links.querySelectorAll("a").forEach(a => {
+        a.addEventListener("click", () => {
+          links.classList.remove("open");
+          toggle.setAttribute("aria-expanded", "false");
+        });
+      });
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 14. CLEAR DATA WORKFLOW
+    // ──────────────────────────────────────────────────────────────
+
+    function setupClearData() {
+      document.getElementById("clearDataBtn").addEventListener("click", () => {
+        document.getElementById("clearConfirm").classList.remove("hidden");
+      });
+      document.getElementById("cancelClearBtn").addEventListener("click", () => {
+        document.getElementById("clearConfirm").classList.add("hidden");
+      });
+      document.getElementById("confirmClearBtn").addEventListener("click", () => {
+        document.getElementById("clearConfirm").classList.add("hidden");
+        clearDemoData();
+      });
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 15. EVENT LISTENERS — connect buttons to their functions
+    // ──────────────────────────────────────────────────────────────
+
+    function setupEventListeners() {
+      // Donation form
+      document.getElementById("donationForm").addEventListener("submit", handleDonationSubmit);
+
+      // Filter bar
+      document.getElementById("applyFiltersBtn").addEventListener("click", applyFilters);
+      document.getElementById("clearFiltersBtn").addEventListener("click", clearFilters);
+
+      // Live search — update results as the user types
+      document.getElementById("searchQuery").addEventListener("input", applyFilters);
+
+      // Smart matching
+      document.getElementById("runMatchBtn").addEventListener("click", matchDonations);
+
+      // Pickup modal
+      document.getElementById("closePickupModal").addEventListener("click", closePickupModal);
+      document.getElementById("cancelPickupBtn").addEventListener("click", closePickupModal);
+      document.getElementById("pickupForm").addEventListener("submit", requestPickup);
+
+      // Detail modal
+      document.getElementById("closeDetailModal").addEventListener("click", closeDetailModal);
+
+      // Close modals when clicking outside (on the overlay)
+      document.getElementById("pickupModal").addEventListener("click", function(e) {
+        if (e.target === this) closePickupModal();
+      });
+      document.getElementById("detailModal").addEventListener("click", function(e) {
+        if (e.target === this) closeDetailModal();
+      });
+
+      // Close modals with Escape key
+      document.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+          closePickupModal();
+          closeDetailModal();
+        }
+      });
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 16. INITIALISE — runs when the page has fully loaded
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * init()
+     * The main startup function. Called once when the page loads.
+     * Sets up all data, renders all components, and attaches events.
+     */
+    function init() {
+      loadDonations();        // Load saved or demo data from localStorage
+      renderDonations(donations); // Show donation cards
+      updateDashboard();      // Fill in the dashboard numbers
+      updateStatsStrip();     // Fill in the hero stats
+      setupNavigation();      // Set up the mobile menu
+      setupEventListeners();  // Connect all buttons and forms
+      setupClearData();       // Set up the clear-data confirmation flow
+    }
+
+    // Run init() once the browser has finished loading the page
+    document.addEventListener("DOMContentLoaded", init);
+
+  </script>
+</body>
+</html>
